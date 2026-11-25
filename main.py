@@ -18,6 +18,13 @@ MAX_CHARS = 120
 def main():
     if not 1 <= len(ENTRY) <= MAX_CHARS or not ENTRY.strip():
         raise ValueError("entry must be 1-120 non-blank characters")
+    # Byte-length guard: the gate counts characters, the tie-break counts
+    # bytes, so the entry must also fit 120 bytes once encoded as UTF-8,
+    # and must carry no trailing whitespace that would pad the file.
+    if len(ENTRY.encode("utf-8")) > MAX_CHARS:
+        raise ValueError("entry exceeds 120 bytes when encoded as UTF-8")
+    if ENTRY != ENTRY.strip():
+        raise ValueError("entry must not start or end with whitespace")
     output_path = "/output/entry.txt"
     os.makedirs(os.path.dirname(output_path), exist_ok=True)
     with open(output_path, "w", encoding="utf-8") as handle:
